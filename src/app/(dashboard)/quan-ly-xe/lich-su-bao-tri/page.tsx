@@ -1,5 +1,6 @@
 // src/app/(dashboard)/quan-ly-xe/lich-su-bao-tri/page.tsx
-
+import { cookies } from "next/headers";
+import { COOKIES, MOCK_TENANTS } from "@/lib/constants";
 import { vehicleService } from "@/lib/services/vehicle.service";
 import MaintenanceHistoryTable from "./_components/MaintenanceHistoryTable";
 import FraudAlertWidget from "./_components/FraudAlertWidget";
@@ -9,9 +10,13 @@ export const dynamic = "force-dynamic";
 export default async function LichSuBaoTriPage() {
   // SERVER PATH: Fetch cả hai nguồn dữ liệu song song để tăng tốc
   // Promise.all = chạy đồng thời, không chờ nhau tuần tự
+  const cookieStore = await cookies();
+  const viewingTenantId =
+    cookieStore.get(COOKIES.VIEWING_TENANT_ID)?.value || MOCK_TENANTS[0].id;
+
   const [initialExpenses, initialVehicles] = await Promise.all([
-    vehicleService.getExpenses(),
-    vehicleService.getVehicles(),
+    vehicleService.getExpenses(viewingTenantId),
+    vehicleService.getVehicles(viewingTenantId),
   ]);
 
   return (

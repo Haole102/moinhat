@@ -1,12 +1,17 @@
 // src/app/(dashboard)/quan-ly-xe/canh-bao-dinh-vi/page.tsx
-
+import { cookies } from "next/headers";
+import { COOKIES, MOCK_TENANTS } from "@/lib/constants";
 import { vehicleService } from "@/lib/services/vehicle.service";
 import MaintenanceAlertList from "./_components/MaintenanceAlertList";
 
 export const dynamic = "force-dynamic";
 
 export default async function CanhBaoDinhViPage() {
-  const initialVehicles = await vehicleService.getVehicles();
+  const cookieStore = await cookies();
+  const viewingTenantId =
+    cookieStore.get(COOKIES.VIEWING_TENANT_ID)?.value || MOCK_TENANTS[0].id;
+
+  const initialVehicles = await vehicleService.getVehicles(viewingTenantId);
 
   // Đếm sẵn trên server để hiển thị số liệu tổng quan ở header
   const redCount = initialVehicles.filter(

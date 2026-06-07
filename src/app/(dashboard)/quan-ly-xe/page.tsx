@@ -1,6 +1,8 @@
 import { vehicleService, Vehicle } from "@/lib/services/vehicle.service";
 import VehicleTable from "./_components/VehicleTable";
 import ModalAddVehicle from "./_components/ModalAddVehicle";
+import { cookies } from "next/headers";
+import { COOKIES, MOCK_TENANTS } from "@/lib/constants";
 
 // Ép trang luôn render động theo từng request (Phục vụ việc phân tách dữ liệu Tenant liên tục)
 export const dynamic = "force-dynamic";
@@ -9,9 +11,12 @@ export default async function QuanLyXePage() {
   // SERVER PATH: Đọc dữ liệu thô lần đầu
   // FIX: Thêm ": Vehicle[]" để TypeScript hiểu đây là mảng chứa thông tin xe
   let initialVehicles: Vehicle[] = [];
+  const cookieStore = await cookies();
+  const viewingTenantId =
+    cookieStore.get(COOKIES.VIEWING_TENANT_ID)?.value || MOCK_TENANTS[0].id;
 
   try {
-    initialVehicles = await vehicleService.getVehicles();
+    initialVehicles = await vehicleService.getVehicles(viewingTenantId);
   } catch (error) {
     console.error("Lỗi SSR fetch vehicles:", error);
   }

@@ -1,12 +1,17 @@
+import { cookies } from "next/headers";
+import { COOKIES, MOCK_TENANTS } from "@/lib/constants";
 import { vehicleService } from "@/lib/services/vehicle.service";
 import DashboardClientWrapper from "./components/DashboardClientWrapper";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  // Lấy dữ liệu tĩnh ban đầu từ Server chuyển giao qua ranh giới Client
-  const initialVehicles = await vehicleService.getVehicles();
-  const initialExpenses = await vehicleService.getExpenses();
+  const cookieStore = await cookies();
+  const viewingTenantId =
+    cookieStore.get(COOKIES.VIEWING_TENANT_ID)?.value || MOCK_TENANTS[0].id;
+
+  const initialVehicles = await vehicleService.getVehicles(viewingTenantId);
+  const initialExpenses = await vehicleService.getExpenses(viewingTenantId);
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
@@ -18,8 +23,6 @@ export default async function DashboardPage() {
           Báo cáo P&L phân luồng Multi-tenant tích hợp Real-time GPS Tracker.
         </p>
       </div>
-
-      {/* Chuyển tiếp dữ liệu sang Client Layer xử lý tương tác */}
       <DashboardClientWrapper
         initialVehicles={initialVehicles}
         initialExpenses={initialExpenses}

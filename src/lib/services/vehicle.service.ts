@@ -9,10 +9,10 @@ export interface Vehicle {
   type: string;
   status: VehicleStatus;
   driverName: string;
-  odometer: number; // Đồng bộ tự động từ thiết bị định vị GPS (Thời gian thực)
+  odometer: number;
   lastOilChangeKM: number;
-  nextOilChangeKM: number; // Ngưỡng định vị GPS kích hoạt cảnh báo thay dầu
-  tireKM: number; // Số KM lốp hiện tại đã chạy
+  nextOilChangeKM: number;
+  tireKM: number;
   tenantId: string;
   hasPendingRepair?: boolean;
 }
@@ -24,18 +24,17 @@ export interface MaintenanceExpense {
   category: ExpenseCategory;
   amount: number;
   description: string;
-  receiptImage: string; // Chuỗi Base64 hoặc URL ảnh chụp trực tiếp từ Camera
-  status: ExpenseStatus; // Workflow kiểm duyệt dòng tiền
+  receiptImage: string;
+  status: ExpenseStatus;
   createdAt: string;
   tenantId: string;
 }
 
-// TUẦN 4: Chuyển thành false để kết nối thẳng tới Postgres/API của Quân
 const IS_MOCK = true;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-// Khởi tạo Mock Data trong RAM bộ nhớ tạm thời
 let mockVehicles: Vehicle[] = [
+  // ---- TENANT 123: Công ty Acme ----
   {
     id: "v1",
     plateNumber: "29A-123.45",
@@ -76,10 +75,80 @@ let mockVehicles: Vehicle[] = [
     tenantId: "tenant_123",
     hasPendingRepair: true,
   },
+
+  // ---- TENANT 456: Logistics Toàn Cầu ----
+  {
+    id: "v4",
+    plateNumber: "51A-555.67",
+    model: "Volvo FH16",
+    type: "Đầu Kéo",
+    status: "on_road",
+    driverName: "Phạm Minh Tuấn",
+    odometer: 125000,
+    lastOilChangeKM: 120000,
+    nextOilChangeKM: 127000,
+    tireKM: 38000,
+    tenantId: "tenant_456",
+  },
+  {
+    id: "v5",
+    plateNumber: "43B-888.99",
+    model: "Thaco Auman C160",
+    type: "Tải",
+    status: "waiting",
+    driverName: "Vũ Đình Khải",
+    odometer: 67400,
+    lastOilChangeKM: 63000,
+    nextOilChangeKM: 70000,
+    tireKM: 67400,
+    tenantId: "tenant_456",
+  },
+  {
+    id: "v6",
+    plateNumber: "72C-321.00",
+    model: "Mercedes Actros",
+    type: "Đầu Kéo",
+    status: "on_road",
+    driverName: "Bùi Thanh Sơn",
+    odometer: 203000,
+    lastOilChangeKM: 199000,
+    nextOilChangeKM: 206000,
+    tireKM: 12000,
+    tenantId: "tenant_456",
+  },
+
+  // ---- TENANT 789: Xây dựng Vin-Group ----
+  {
+    id: "v7",
+    plateNumber: "92C-111.22",
+    model: "Kia K250",
+    type: "Tải",
+    status: "maintenance",
+    driverName: "Đặng Quốc Việt",
+    odometer: 31000,
+    lastOilChangeKM: 28000,
+    nextOilChangeKM: 35000,
+    tireKM: 31000,
+    tenantId: "tenant_789",
+    hasPendingRepair: true,
+  },
+  {
+    id: "v8",
+    plateNumber: "88D-777.33",
+    model: "Hyundai HD320",
+    type: "Bồn",
+    status: "on_road",
+    driverName: "Ngô Thế Anh",
+    odometer: 54200,
+    lastOilChangeKM: 50000,
+    nextOilChangeKM: 54000,
+    tireKM: 54200,
+    tenantId: "tenant_789",
+  },
 ];
 
 let mockExpenses: MaintenanceExpense[] = [
-  // --- Tháng 6/2026 ---
+  // ---- TENANT 123 ----
   {
     id: "e1",
     vehicleId: "v1",
@@ -105,7 +174,6 @@ let mockExpenses: MaintenanceExpense[] = [
     tenantId: "tenant_123",
   },
   {
-    // ⚠️ FRAUD SIGNAL: v1 thay lốp lần 1 trong tháng 6
     id: "e3",
     vehicleId: "v1",
     plateNumber: "29A-123.45",
@@ -118,7 +186,6 @@ let mockExpenses: MaintenanceExpense[] = [
     tenantId: "tenant_123",
   },
   {
-    // ⚠️ FRAUD SIGNAL: v1 thay lốp lần 2 trong tháng 6 — trigger cảnh báo bất thường
     id: "e4",
     vehicleId: "v1",
     plateNumber: "29A-123.45",
@@ -142,7 +209,6 @@ let mockExpenses: MaintenanceExpense[] = [
     createdAt: "2026-06-20T21:10:00.000Z",
     tenantId: "tenant_123",
   },
-  // --- Tháng 5/2026 ---
   {
     id: "e6",
     vehicleId: "v2",
@@ -167,7 +233,6 @@ let mockExpenses: MaintenanceExpense[] = [
     createdAt: "2026-05-28T07:55:00.000Z",
     tenantId: "tenant_123",
   },
-  // --- Tháng 4/2026 ---
   {
     id: "e8",
     vehicleId: "v1",
@@ -180,12 +245,68 @@ let mockExpenses: MaintenanceExpense[] = [
     createdAt: "2026-04-15T13:00:00.000Z",
     tenantId: "tenant_123",
   },
+
+  // ---- TENANT 456 ----
+  {
+    id: "e9",
+    vehicleId: "v4",
+    plateNumber: "51A-555.67",
+    category: "oil",
+    amount: 2800000,
+    description: "Thay nhớt động cơ Volvo FH16 định kỳ 7,000 KM",
+    receiptImage: "mock_base64_image_data",
+    status: "approved",
+    createdAt: "2026-06-03T07:00:00.000Z",
+    tenantId: "tenant_456",
+  },
+  {
+    id: "e10",
+    vehicleId: "v5",
+    plateNumber: "43B-888.99",
+    category: "tire",
+    amount: 9600000,
+    description: "Thay 4 lốp toàn bộ cầu trước",
+    receiptImage: "mock_base64_image_data",
+    status: "pending",
+    createdAt: "2026-06-22T11:30:00.000Z",
+    tenantId: "tenant_456",
+  },
+
+  // ---- TENANT 789 ----
+  {
+    id: "e11",
+    vehicleId: "v7",
+    plateNumber: "92C-111.22",
+    category: "engine",
+    amount: 6500000,
+    description: "Thay gioăng máy bị rò rỉ nhớt",
+    receiptImage: "mock_base64_image_data",
+    status: "pending",
+    createdAt: "2026-06-19T15:00:00.000Z",
+    tenantId: "tenant_789",
+  },
+  {
+    id: "e12",
+    vehicleId: "v8",
+    plateNumber: "88D-777.33",
+    category: "oil",
+    amount: 1500000,
+    description: "Thay nhớt máy + lọc nhớt HD320",
+    receiptImage: "mock_base64_image_data",
+    status: "approved",
+    createdAt: "2026-06-08T08:45:00.000Z",
+    tenantId: "tenant_789",
+  },
 ];
 
 export const vehicleService = {
-  async getVehicles(): Promise<Vehicle[]> {
+  // tenantId là optional — nếu không truyền thì trả về tất cả (dùng cho Super Admin xem tổng)
+  async getVehicles(tenantId?: string): Promise<Vehicle[]> {
     if (IS_MOCK) {
       await new Promise((r) => setTimeout(r, 300));
+      if (tenantId) {
+        return mockVehicles.filter((v) => v.tenantId === tenantId);
+      }
       return [...mockVehicles];
     }
     const res = await fetch(`${API_BASE_URL}/api/vehicles`, {
@@ -207,7 +328,7 @@ export const vehicleService = {
         driverName: data.driverName || "Chưa bàn giao",
         odometer: data.odometer || 0,
         lastOilChangeKM: data.odometer || 0,
-        nextOilChangeKM: (data.odometer || 0) + 7000, // Tự động thiết lập chu kỳ thay dầu sau 7,000 KM
+        nextOilChangeKM: (data.odometer || 0) + 7000,
         tireKM: 0,
         tenantId: "tenant_123",
       };
@@ -222,9 +343,12 @@ export const vehicleService = {
     return res.json();
   },
 
-  async getExpenses(): Promise<MaintenanceExpense[]> {
+  async getExpenses(tenantId?: string): Promise<MaintenanceExpense[]> {
     if (IS_MOCK) {
       await new Promise((r) => setTimeout(r, 200));
+      if (tenantId) {
+        return mockExpenses.filter((e) => e.tenantId === tenantId);
+      }
       return [...mockExpenses];
     }
     const res = await fetch(`${API_BASE_URL}/api/expenses`, {
@@ -247,9 +371,9 @@ export const vehicleService = {
         amount: data.amount || 0,
         description: data.description || "",
         receiptImage: data.receiptImage || "",
-        status: "pending", // Ép buộc rơi vào trạng thái Chờ duyệt phòng chống gian lận
+        status: "pending",
         createdAt: new Date().toISOString(),
-        tenantId: "tenant_123",
+        tenantId: targetVehicle?.tenantId || "tenant_123",
       };
       mockExpenses = [newExpense, ...mockExpenses];
       return newExpense;
@@ -268,7 +392,6 @@ export const vehicleService = {
       const expenseIndex = mockExpenses.findIndex((e) => e.id === expenseId);
       if (expenseIndex !== -1) {
         mockExpenses[expenseIndex].status = "approved";
-        // Đồng thời nếu chi phí liên quan đến thay lốp hoặc dầu -> cập nhật thông số GPS xe ngầm
         const exp = mockExpenses[expenseIndex];
         const vIndex = mockVehicles.findIndex((v) => v.id === exp.vehicleId);
         if (vIndex !== -1) {

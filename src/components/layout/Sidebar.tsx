@@ -9,9 +9,14 @@ import TenantSelector from "./TenantSelector";
 interface SidebarProps {
   isCollapsed: boolean;
   role: string;
+  viewingTenantId: string; // NEW
 }
 
-export default function Sidebar({ isCollapsed, role }: SidebarProps) {
+export default function Sidebar({
+  isCollapsed,
+  role,
+  viewingTenantId,
+}: SidebarProps) {
   const pathname = usePathname();
   const [isOperateOpen, setIsOperateOpen] = useState(true);
 
@@ -22,7 +27,7 @@ export default function Sidebar({ isCollapsed, role }: SidebarProps) {
       }`}
     >
       {/* 1. Header: Thông tin Công ty */}
-      <TenantSelector role={role} />
+      <TenantSelector role={role} viewingTenantId={viewingTenantId} />
 
       {/* 2. Body: Các đường link menu */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
