@@ -94,8 +94,12 @@ export default function Sidebar({ isCollapsed, role }: SidebarProps) {
                     Lịch sử bảo trì
                   </Link>
                   <Link
-                    href="#"
-                    className="px-2 py-1.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                    href="/quan-ly-xe/canh-bao-dinh-vi"
+                    className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                      pathname === "/quan-ly-xe/canh-bao-dinh-vi"
+                        ? "bg-slate-100 font-semibold text-slate-900"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
                   >
                     Cảnh báo định vị
                   </Link>
