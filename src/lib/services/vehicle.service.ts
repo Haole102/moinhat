@@ -31,7 +31,18 @@ export interface MaintenanceExpense {
 }
 
 const IS_MOCK = true;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+const getApiBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  return "";
+};
 
 let mockVehicles: Vehicle[] = [
   // ---- TENANT 123: Công ty Acme ----
@@ -309,7 +320,7 @@ export const vehicleService = {
       }
       return [...mockVehicles];
     }
-    const res = await fetch(`${API_BASE_URL}/api/vehicles`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/vehicles`, {
       cache: "no-store",
     });
     if (!res.ok) throw new Error("Không thể lấy danh sách xe");
@@ -335,7 +346,7 @@ export const vehicleService = {
       mockVehicles = [newVehicle, ...mockVehicles];
       return newVehicle;
     }
-    const res = await fetch(`${API_BASE_URL}/api/vehicles`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/vehicles`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -351,7 +362,7 @@ export const vehicleService = {
       }
       return [...mockExpenses];
     }
-    const res = await fetch(`${API_BASE_URL}/api/expenses`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/expenses`, {
       cache: "no-store",
     });
     return res.json();
@@ -378,7 +389,7 @@ export const vehicleService = {
       mockExpenses = [newExpense, ...mockExpenses];
       return newExpense;
     }
-    const res = await fetch(`${API_BASE_URL}/api/expenses`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/expenses`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -409,7 +420,7 @@ export const vehicleService = {
       throw new Error("Không tìm thấy bản ghi chi phí");
     }
     const res = await fetch(
-      `${API_BASE_URL}/api/expenses/${expenseId}/approve`,
+      `${getApiBaseUrl()}/api/expenses/${expenseId}/approve`,
       { method: "PATCH" },
     );
     return res.json();

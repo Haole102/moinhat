@@ -108,6 +108,16 @@ export default function Sidebar({
                   >
                     Cảnh báo định vị
                   </Link>
+                  <Link
+                    href="/quan-ly-xe/vetc"
+                    className={`px-2 py-1.5 text-sm rounded-md transition-colors ${
+                      pathname === "/quan-ly-xe/vetc"
+                        ? "bg-slate-100 font-semibold text-slate-900"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                  >
+                    Đối soát VETC
+                  </Link>
                 </div>
               )}
             </div>
